@@ -67,15 +67,15 @@ const save = (value, field, subfield = undefined) => {
     const [deployerWallet] = await ethers.getSigners();
     save(deployerWallet.address, 'deployer');
 
-    if (deployerWallet.address !== expectedDeployer) {
-      throw new Error(`Unexpected deployer address. Found ${deployerWallet.address}, expected ${expectedDeployer}.`);
-    }
+    // if (deployerWallet.address !== expectedDeployer) {
+    //   throw new Error(`Unexpected deployer address. Found ${deployerWallet.address}, expected ${expectedDeployer}.`);
+    // }
 
-    const deployerNonce = await deployerWallet.getTransactionCount();
+    // const deployerNonce = await deployerWallet.getTransactionCount();
 
-    if (deployerNonce !== expectedNonce) {
-      throw new Error(`Unexpected deployer nonce. Found ${deployerNonce}, expected ${expectedNonce}.`);
-    }
+    // if (deployerNonce !== expectedNonce) {
+    //   throw new Error(`Unexpected deployer nonce. Found ${deployerNonce}, expected ${expectedNonce}.`);
+    // }
 
     // deploy the Umbra contracts
     const StealthKeyRegistry = await ethers.getContractFactory('StealthKeyRegistry', deployerWallet);

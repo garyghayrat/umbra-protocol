@@ -74,6 +74,8 @@ const config: HardhatUserConfig = {
         url: `https://rinkeby.infura.io/v3/${infuraApiKey}`,
       },
       chainId: chainIds.hardhat,
+      gasPrice: 100000000000, // 60 gwei
+      gasLimit: 500
       accounts: {
         count: 10,
         initialIndex: 0,
