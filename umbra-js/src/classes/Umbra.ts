@@ -169,6 +169,8 @@ export class Umbra {
 
     // Lookup recipient's public key
     const { spendingPublicKey, viewingPublicKey } = await lookupRecipient(recipientId, this.provider, lookupOverrides);
+    console.log('spendingPublicKey: ', spendingPublicKey);
+    console.log('viewingPublicKey:  ', viewingPublicKey);
     if (!spendingPublicKey || !viewingPublicKey) {
       throw new Error(`Could not retrieve public keys for recipient ID ${recipientId}`);
     }

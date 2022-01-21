@@ -20,6 +20,7 @@ import { default as Resolution, Eip1993Factories } from '@unstoppabledomains/res
 import { StealthKeyRegistry } from '../classes/StealthKeyRegistry';
 import { TxHistoryProvider } from '../classes/TxHistoryProvider';
 import { EthersProvider } from '../types';
+import { UnsignedTransaction } from 'ethers';
 
 // Lengths of various properties when represented as full hex strings
 export const lengths = {
@@ -50,24 +51,45 @@ export async function recoverPublicKeyFromTransaction(txHash: string, provider: 
     throw new Error('Invalid transaction hash provided');
   }
   const tx = await provider.getTransaction(txHash);
+  console.log('tx: ', tx);
+  console.log('receipt: ', await provider.getTransactionReceipt(txHash));
   if (!tx) {
     throw new Error('Transaction not found. Are the provider and transaction hash on the same network?');
   }
 
   // Reconstruct transaction payload that was originally signed
-  const txData = {
-    chainId: tx.chainId,
-    data: tx.data,
-    gasLimit: tx.gasLimit,
-    gasPrice: tx.gasPrice,
-    nonce: tx.nonce,
-    to: tx.to, // this works for both regular and contract transactions
-    value: tx.value,
-  };
+  let txData: any;
+  if (tx.type === 2) {
+    console.log('tx.type: ', tx.type);
+    txData = {
+      chainId: tx.chainId,
+      data: tx.data,
+      gasLimit: tx.gasLimit,
+      maxFeePerGas: tx.maxFeePerGas,
+      maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+      nonce: tx.nonce,
+      to: tx.to, // this works for both regular and contract transactions
+      value: tx.value,
+      type: tx.type
+    };
+  } else {
+    console.log('tx.type: ', 'not 2');
+    txData = {
+      chainId: tx.chainId,
+      data: tx.data,
+      gasLimit: tx.gasLimit,
+      gasPrice: tx.gasPrice,
+      nonce: tx.nonce,
+      to: tx.to, // this works for both regular and contract transactions
+      value: tx.value,
+    };
+  }
+  console.log('txData: ', txData); 
 
   // Properly format transaction payload to get the correct message
   const resolvedTx = await resolveProperties(txData);
-  const rawTx = serializeTransaction(resolvedTx);
+  console.log('resolvedTx: ', resolvedTx);
+  const rawTx = serializeTransaction(resolvedTx as UnsignedTransaction);
   const msgHash = keccak256(rawTx);
 
   // Recover sender's public key
@@ -90,6 +112,7 @@ export async function getSentTransaction(address: string, ethersProvider: Ethers
   const network = await ethersProvider.getNetwork();
   const txHistoryProvider = new TxHistoryProvider(network.chainId);
   const history = await txHistoryProvider.getHistory(address);
+  console.log('history: ', history);
   let txHash;
   for (let i = 0; i < history.length; i += 1) {
     const tx = history[i];
